@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 import prisma from "@/lib/prisma"
 import bcrypt from "bcrypt"
+import GithubProvider from "next-auth/providers/github"
 
 export const authOptions = {
     adapter: PrismaAdapter(prisma) as any,
@@ -33,6 +34,10 @@ export const authOptions = {
                     image: user.image,
                 }
             },
+        }),
+        GithubProvider({
+            clientId: process.env.GITHUB_ID!,
+            clientSecret: process.env.GITHUB_SECRET!,
         }),
     ],
     callbacks: {
