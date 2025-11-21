@@ -4,7 +4,9 @@ import { redirect } from "next/navigation"
 import TasksWidget from "@/components/dashboard/tasks-widget"
 import NotesWidget from "@/components/dashboard/notes-widget"
 import StatsWidget from "@/components/dashboard/stats-widget"
-import { CloudSun, LayoutDashboard, Settings, User } from "lucide-react"
+import WeatherWidget from "@/components/dashboard/weather-widget"
+import DetailedWeatherWidget from "@/components/dashboard/detailed-weather-widget"
+import { LayoutDashboard, Settings, User } from "lucide-react"
 
 import prisma from "@/lib/prisma"
 
@@ -66,18 +68,6 @@ export default async function DashboardPage() {
                         </h1>
                         <p className="text-slate-400 mt-2 text-lg">Prêt à organiser votre journée ?</p>
                     </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center gap-3 hover:bg-white/10 transition-colors cursor-default">
-                            <div className="p-2 bg-yellow-500/20 rounded-lg">
-                                <CloudSun className="w-6 h-6 text-yellow-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-slate-400">Météo</p>
-                                <p className="font-semibold">24°C Ensoleillé</p>
-                            </div>
-                        </div>
-                    </div>
                 </header>
 
                 {/* Dashboard Grid */}
@@ -95,6 +85,11 @@ export default async function DashboardPage() {
                     {/* Stats Widget */}
                     <div className="md:col-span-1 h-[400px]">
                         <StatsWidget tasks={tasks} />
+                    </div>
+
+                    {/* Detailed Weather Widget */}
+                    <div className="md:col-span-1 h-[450px]">
+                        <DetailedWeatherWidget />
                     </div>
                 </div>
             </main>
