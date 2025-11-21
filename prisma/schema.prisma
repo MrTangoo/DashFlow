@@ -14,7 +14,8 @@ model User {
   password      String
   name          String?
   emailVerified DateTime?
-  image         String?
+  image         String?   // URL or path to image
+  imageData     Bytes?    // Binary image data (blob)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
