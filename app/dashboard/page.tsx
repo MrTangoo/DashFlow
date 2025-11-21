@@ -7,6 +7,7 @@ import StatsWidget from "@/components/dashboard/stats-widget"
 import WeatherWidget from "@/components/dashboard/weather-widget"
 import DetailedWeatherWidget from "@/components/dashboard/detailed-weather-widget"
 import PomodoroWidget from "@/components/dashboard/pomodoro-widget"
+import WaterTrackerWidget from "@/components/dashboard/water-tracker-widget"
 
 import prisma from "@/lib/prisma"
 
@@ -84,6 +85,11 @@ export default async function DashboardPage() {
                 {/* Pomodoro Widget */}
                 <div className="md:col-span-1 h-[450px]">
                     <PomodoroWidget />
+                </div>
+
+                {/* Water Tracker Widget */}
+                <div className="md:col-span-1 h-[450px]">
+                    <WaterTrackerWidget />
                 </div>
 
                 {/* Detailed Weather Widget */}
