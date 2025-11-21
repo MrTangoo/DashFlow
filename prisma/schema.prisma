@@ -19,11 +19,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
-  accounts Account[]
-  sessions Session[]
-  widgets  Widget[]
-  tasks    Task[]
-  notes    Note[]
+  accounts   Account[]
+  sessions   Session[]
+  widgets    Widget[]
+  tasks      Task[]
+  notes      Note[]
+  dailyData  DailyData[]
 }
 
 model Account {
@@ -77,9 +78,12 @@ model Task {
   id        String   @id @default(cuid())
   title     String
   completed Boolean  @default(false)
+  date      String   // Date string (YYYY-MM-DD) for daily scoping
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
+  @@index([userId, date])
 }
 
 model Note {
@@ -89,4 +93,17 @@ model Note {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model DailyData {
+  id           String   @id @default(cuid())
+  userId       String
+  date         String   // Date string (YYYY-MM-DD)
+  waterBottles Int      @default(0)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }

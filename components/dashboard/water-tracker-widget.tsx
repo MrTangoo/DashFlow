@@ -5,49 +5,63 @@ import { Droplet, Plus, Minus, RotateCcw } from "lucide-react";
 
 export default function WaterTrackerWidget() {
     const [bottles, setBottles] = useState(0);
+    const [loading, setLoading] = useState(true);
     const bottleSize = 1; // 1L per bottle
     const dailyGoalLiters = 4; // 4L per day
     const dailyGoalBottles = dailyGoalLiters / bottleSize; // 4 bottles
 
-    // Load from localStorage on mount
+    // Load from API on mount
     useEffect(() => {
-        const saved = localStorage.getItem("waterTracker");
-        if (saved) {
-            try {
-                const data = JSON.parse(saved);
-                const today = new Date().toDateString();
-                if (data.date === today && typeof data.bottles === 'number') {
-                    setBottles(data.bottles);
-                } else {
-                    // New day, reset
-                    setBottles(0);
-                    localStorage.setItem("waterTracker", JSON.stringify({ date: today, bottles: 0 }));
-                }
-            } catch (error) {
-                console.error("Error loading water tracker data:", error);
-                setBottles(0);
-            }
-        }
+        fetchWaterData();
     }, []);
 
-    // Save to localStorage whenever bottles changes
-    useEffect(() => {
-        if (typeof bottles === 'number' && !isNaN(bottles)) {
-            const today = new Date().toDateString();
-            localStorage.setItem("waterTracker", JSON.stringify({ date: today, bottles }));
+    const fetchWaterData = async () => {
+        try {
+            const res = await fetch("/api/daily-data");
+            if (res.ok) {
+                const data = await res.json();
+                setBottles(data.waterBottles || 0);
+            }
+        } catch (error) {
+            console.error("Error fetching water data:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [bottles]);
+    };
+
+    const updateWaterData = async (newBottles: number) => {
+        try {
+            const res = await fetch("/api/daily-data", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ waterBottles: newBottles }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setBottles(data.waterBottles);
+            }
+        } catch (error) {
+            console.error("Error updating water data:", error);
+        }
+    };
 
     const addBottle = () => {
-        setBottles(prev => prev + 1);
+        const newBottles = bottles + 1;
+        setBottles(newBottles);
+        updateWaterData(newBottles);
     };
 
     const removeBottle = () => {
-        setBottles(prev => Math.max(0, prev - 1));
+        if (bottles > 0) {
+            const newBottles = bottles - 1;
+            setBottles(newBottles);
+            updateWaterData(newBottles);
+        }
     };
 
     const reset = () => {
         setBottles(0);
+        updateWaterData(0);
     };
 
     const currentLiters = bottles * bottleSize;
