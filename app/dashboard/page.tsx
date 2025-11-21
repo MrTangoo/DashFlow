@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
 import TasksWidget from "@/components/dashboard/tasks-widget"
 import NotesWidget from "@/components/dashboard/notes-widget"
+import StatsWidget from "@/components/dashboard/stats-widget"
 import { CloudSun, LayoutDashboard, Settings, User } from "lucide-react"
 
 export default async function DashboardPage() {
@@ -84,6 +85,10 @@ export default async function DashboardPage() {
                         <NotesWidget />
                     </div>
 
+                    {/* Stats Widget */}
+                    <div className="md:col-span-1 h-[400px]">
+                        <StatsWidget />
+                    </div>
                 </div>
             </main>
         </div>
