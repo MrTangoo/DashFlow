@@ -31,15 +31,35 @@ export default async function DashboardPage() {
         <>
             {/* Header */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
-                <div>
-                    <p className="text-blue-400 font-medium mb-2 uppercase tracking-wider text-sm flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                        {currentDate}
-                    </p>
-                    <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-                        Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">{session.user?.name || "Utilisateur"}</span>
-                    </h1>
-                    <p className="text-slate-400 mt-2 text-lg">Prêt à organiser votre journée ?</p>
+                <div className="flex items-center gap-4">
+                    {/* Profile Picture */}
+                    {session.user?.image && (
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/10 shadow-xl bg-slate-800 flex-shrink-0">
+                            {session.user.image.startsWith('/api/') ? (
+                                <img
+                                    src={session.user.image}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <img
+                                    src={session.user.image}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
+                        </div>
+                    )}
+                    <div>
+                        <p className="text-blue-400 font-medium mb-2 uppercase tracking-wider text-sm flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                            {currentDate}
+                        </p>
+                        <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                            Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">{session.user?.name || "Utilisateur"}</span>
+                        </h1>
+                        <p className="text-slate-400 mt-2 text-lg">Prêt à organiser votre journée ?</p>
+                    </div>
                 </div>
             </header>
 
