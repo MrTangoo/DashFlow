@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
-import { LayoutDashboard, Settings, User } from "lucide-react";
+import { LayoutDashboard, Settings, User, LogOut } from "lucide-react";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 
 export default function DashboardLayout({
     children,
@@ -36,6 +39,15 @@ export default function DashboardLayout({
                         <Settings className="w-5 h-5" />
                     </button>
                 </div>
+
+                {/* Logout Button at Bottom */}
+                <button
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    className="p-3 rounded-xl hover:bg-red-500/10 text-white/70 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all"
+                    title="Se déconnecter"
+                >
+                    <LogOut className="w-5 h-5" />
+                </button>
             </nav>
 
             <main className="lg:pl-28 p-8 max-w-[1600px] mx-auto">

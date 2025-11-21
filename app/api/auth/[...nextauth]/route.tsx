@@ -41,12 +41,39 @@ export const authOptions = {
         }),
     ],
     callbacks: {
-        async jwt({ token, user }: any) {
-            if (user) token.id = user.id
+        async jwt({ token, user, trigger }: any) {
+            // On initial sign in, add user id to token
+            if (user) {
+                token.id = user.id
+                token.name = user.name
+                token.email = user.email
+                token.picture = user.image
+            }
+
+            // On session update or token refresh, fetch fresh user data
+            if (trigger === "update" || !user) {
+                if (token.id) {
+                    const freshUser = await prisma.user.findUnique({
+                        where: { id: token.id as string },
+                        select: { id: true, name: true, email: true, image: true }
+                    })
+                    if (freshUser) {
+                        token.name = freshUser.name
+                        token.email = freshUser.email
+                        token.picture = freshUser.image
+                    }
+                }
+            }
+
             return token
         },
         async session({ session, token }: any) {
-            if (session.user) session.user.id = token.id as string
+            if (session.user) {
+                session.user.id = token.id as string
+                session.user.name = token.name
+                session.user.email = token.email
+                session.user.image = token.picture
+            }
             return session
         },
     },
