@@ -1,12 +1,17 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
 import { useRouter } from "next/navigation"
+import { Plus, StickyNote, Trash2, PenLine, Check, X } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 interface Note {
     id: string
     content: string
     updatedAt: string
+    clientId?: string
 }
 
 export default function NotesWidget() {
@@ -44,6 +49,7 @@ export default function NotesWidget() {
             id: tempId,
             content: newNote,
             updatedAt: new Date().toISOString(),
+            clientId: tempId,
         }
         setNotes([optimisticNote, ...notes])
         setNewNote("")
@@ -57,7 +63,7 @@ export default function NotesWidget() {
 
             if (res.ok) {
                 const createdNote = await res.json()
-                setNotes((prev) => prev.map((n) => (n.id === tempId ? createdNote : n)))
+                setNotes((prev) => prev.map((n) => (n.id === tempId ? { ...createdNote, clientId: tempId } : n)))
                 router.refresh()
             } else {
                 setNotes((prev) => prev.filter((n) => n.id !== tempId))
@@ -112,89 +118,120 @@ export default function NotesWidget() {
     }
 
     return (
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 shadow-xl text-white w-full max-w-md flex flex-col h-[400px]">
-            <h2 className="text-2xl font-bold mb-4">Notes Rapides</h2>
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl h-full flex flex-col relative overflow-hidden group">
+            {/* Decorative background blur */}
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[50px] -z-10 transition-all duration-500 group-hover:bg-blue-500/20" />
 
-            <form onSubmit={addNote} className="mb-4 flex gap-2">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2.5 bg-blue-500/20 rounded-xl text-blue-400">
+                    <StickyNote className="w-6 h-6" />
+                </div>
+                <div>
+                    <h2 className="text-xl font-bold text-white">Notes</h2>
+                    <p className="text-xs text-slate-400 font-medium">{notes.length} notes</p>
+                </div>
+            </div>
+
+            <form onSubmit={addNote} className="mb-6 relative group/input">
                 <input
                     type="text"
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    placeholder="Nouvelle note..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    placeholder="Une idée rapide ?"
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3.5 pl-11 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-sm placeholder:text-white/30"
                 />
+                <Plus className="w-5 h-5 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors group-focus-within/input:text-blue-400" />
                 <button
                     type="submit"
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+                    disabled={!newNote.trim()}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 hover:bg-blue-400 text-white p-1.5 rounded-lg transition-all disabled:opacity-0 disabled:scale-75 opacity-100 scale-100"
                 >
-                    +
+                    <Plus className="w-4 h-4" />
                 </button>
             </form>
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
                 {loading ? (
-                    <div className="text-center py-4 text-white/50">Chargement...</div>
+                    <div className="flex flex-col items-center justify-center h-40 gap-3 text-white/30">
+                        <div className="w-6 h-6 border-2 border-white/20 border-t-blue-500 rounded-full animate-spin" />
+                        <span className="text-sm">Chargement...</span>
+                    </div>
                 ) : notes.length === 0 ? (
-                    <div className="text-center py-4 text-white/50">Aucune note</div>
-                ) : (
-                    notes.map((note) => (
-                        <div
-                            key={note.id}
-                            className="group bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-all relative"
-                        >
-                            {editingId === note.id ? (
-                                <div className="flex gap-2">
-                                    <textarea
-                                        value={editContent}
-                                        onChange={(e) => setEditContent(e.target.value)}
-                                        className="flex-1 bg-black/20 border border-white/10 rounded p-2 text-sm focus:outline-none resize-none"
-                                        rows={3}
-                                        autoFocus
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                        <button
-                                            onClick={() => saveEdit(note.id)}
-                                            className="text-green-400 hover:text-green-300 p-1"
-                                        >
-                                            ✓
-                                        </button>
-                                        <button
-                                            onClick={() => setEditingId(null)}
-                                            className="text-red-400 hover:text-red-300 p-1"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <p
-                                        onClick={() => startEditing(note)}
-                                        className="text-sm text-white/90 whitespace-pre-wrap cursor-pointer"
-                                    >
-                                        {note.content}
-                                    </p>
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                                        <button
-                                            onClick={() => startEditing(note)}
-                                            className="text-white/40 hover:text-white transition-colors"
-                                        >
-                                            ✎
-                                        </button>
-                                        <button
-                                            onClick={() => deleteNote(note.id)}
-                                            className="text-white/40 hover:text-red-400 transition-colors"
-                                        >
-                                            🗑️
-                                        </button>
-                                    </div>
-                                    <div className="mt-2 text-xs text-white/30">
-                                        {new Date(note.updatedAt).toLocaleDateString()}
-                                    </div>
-                                </>
-                            )}
+                    <div className="flex flex-col items-center justify-center h-40 text-center">
+                        <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3">
+                            <StickyNote className="w-6 h-6 text-white/20" />
                         </div>
-                    ))
+                        <p className="text-white/40 text-sm">Aucune note</p>
+                        <p className="text-white/20 text-xs mt-1">Capturez vos idées ici</p>
+                    </div>
+                ) : (
+                    <AnimatePresence initial={false}>
+                        {notes.map((note) => (
+                            <motion.div
+                                key={note.clientId || note.id}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="group relative bg-yellow-100/5 hover:bg-yellow-100/10 border border-white/5 hover:border-white/10 p-4 rounded-2xl transition-all duration-300"
+                            >
+                                {editingId === note.id ? (
+                                    <div className="flex flex-col gap-3">
+                                        <textarea
+                                            value={editContent}
+                                            onChange={(e) => setEditContent(e.target.value)}
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none text-white"
+                                            rows={3}
+                                            autoFocus
+                                        />
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => setEditingId(null)}
+                                                className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => saveEdit(note.id)}
+                                                className="p-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white transition-colors"
+                                            >
+                                                <Check className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p
+                                            onClick={() => startEditing(note)}
+                                            className="text-sm text-white/80 whitespace-pre-wrap cursor-pointer leading-relaxed"
+                                        >
+                                            {note.content}
+                                        </p>
+
+                                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                                            <span className="text-[10px] text-white/20 font-medium uppercase tracking-wider">
+                                                {new Date(note.updatedAt).toLocaleDateString()}
+                                            </span>
+
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                                                <button
+                                                    onClick={() => startEditing(note)}
+                                                    className="p-1.5 rounded-lg text-white/30 hover:text-blue-400 hover:bg-blue-400/10 transition-colors"
+                                                >
+                                                    <PenLine className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteNote(note.id)}
+                                                    className="p-1.5 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 )}
             </div>
         </div>
