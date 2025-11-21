@@ -6,8 +6,6 @@ import NotesWidget from "@/components/dashboard/notes-widget"
 import StatsWidget from "@/components/dashboard/stats-widget"
 import WeatherWidget from "@/components/dashboard/weather-widget"
 import DetailedWeatherWidget from "@/components/dashboard/detailed-weather-widget"
-import { LayoutDashboard, Settings, User } from "lucide-react"
-import Image from "next/image";
 
 import prisma from "@/lib/prisma"
 
@@ -30,70 +28,44 @@ export default async function DashboardPage() {
     })
 
     return (
-        <div className="min-h-screen bg-[#0f172a] text-white overflow-hidden relative selection:bg-purple-500/30">
-            {/* Background Gradients */}
-            <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse delay-1000" />
-                <div className="absolute top-[20%] right-[20%] w-[30%] h-[30%] bg-indigo-500/10 rounded-full blur-[100px]" />
+        <>
+            {/* Header */}
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+                <div>
+                    <p className="text-blue-400 font-medium mb-2 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                        {currentDate}
+                    </p>
+                    <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                        Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">{session.user?.name || "Utilisateur"}</span>
+                    </h1>
+                    <p className="text-slate-400 mt-2 text-lg">Prêt à organiser votre journée ?</p>
+                </div>
+            </header>
+
+            {/* Dashboard Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
+                {/* Tasks Widget - Spans 1 column */}
+                <div className="h-full">
+                    <TasksWidget />
+                </div>
+
+                {/* Notes Widget - Spans 1 column */}
+                <div className="h-full">
+                    <NotesWidget />
+                </div>
+
+                {/* Stats Widget */}
+                <div className="md:col-span-1 h-[400px]">
+                    <StatsWidget tasks={tasks} />
+                </div>
+
+                {/* Detailed Weather Widget */}
+                <div className="md:col-span-1 h-[450px]">
+                    <DetailedWeatherWidget />
+                </div>
             </div>
-
-            {/* Sidebar / Navigation (Simplified for now) */}
-            <nav className="fixed left-0 top-0 h-full w-20 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col items-center py-8 gap-8 z-50 hidden lg:flex">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 border border-white/10">
-                    <Image src="/logo.png" alt="Logo" width={20} height={20} />
-                </div>
-                <div className="flex-1 flex flex-col gap-6 w-full items-center mt-8">
-                    <button className="p-3 rounded-xl bg-white/10 text-white border border-white/10 shadow-inner">
-                        <LayoutDashboard className="w-5 h-5" />
-                    </button>
-                    <button className="p-3 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all">
-                        <User className="w-5 h-5" />
-                    </button>
-                    <button className="p-3 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all">
-                        <Settings className="w-5 h-5" />
-                    </button>
-                </div>
-            </nav>
-
-            <main className="lg:pl-28 p-8 max-w-[1600px] mx-auto">
-                {/* Header */}
-                <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
-                    <div>
-                        <p className="text-blue-400 font-medium mb-2 uppercase tracking-wider text-sm flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                            {currentDate}
-                        </p>
-                        <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-                            Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">{session.user?.name || "Utilisateur"}</span>
-                        </h1>
-                        <p className="text-slate-400 mt-2 text-lg">Prêt à organiser votre journée ?</p>
-                    </div>
-                </header>
-
-                {/* Dashboard Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
-                    {/* Tasks Widget - Spans 1 column */}
-                    <div className="h-full">
-                        <TasksWidget />
-                    </div>
-
-                    {/* Notes Widget - Spans 1 column */}
-                    <div className="h-full">
-                        <NotesWidget />
-                    </div>
-
-                    {/* Stats Widget */}
-                    <div className="md:col-span-1 h-[400px]">
-                        <StatsWidget tasks={tasks} />
-                    </div>
-
-                    {/* Detailed Weather Widget */}
-                    <div className="md:col-span-1 h-[450px]">
-                        <DetailedWeatherWidget />
-                    </div>
-                </div>
-            </main>
-        </div>
+        </>
     )
 }
+
