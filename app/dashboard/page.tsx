@@ -6,12 +6,19 @@ import NotesWidget from "@/components/dashboard/notes-widget"
 import StatsWidget from "@/components/dashboard/stats-widget"
 import { CloudSun, LayoutDashboard, Settings, User } from "lucide-react"
 
+import prisma from "@/lib/prisma"
+
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions)
 
     if (!session) {
         redirect("/login")
     }
+
+    const tasks = await prisma.task.findMany({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+    })
 
     const currentDate = new Date().toLocaleDateString("fr-FR", {
         weekday: "long",
@@ -87,7 +94,7 @@ export default async function DashboardPage() {
 
                     {/* Stats Widget */}
                     <div className="md:col-span-1 h-[400px]">
-                        <StatsWidget />
+                        <StatsWidget tasks={tasks} />
                     </div>
                 </div>
             </main>
