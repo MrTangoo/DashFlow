@@ -7,6 +7,7 @@ import StatsWidget from "@/components/dashboard/stats-widget"
 import WeatherWidget from "@/components/dashboard/weather-widget"
 import DetailedWeatherWidget from "@/components/dashboard/detailed-weather-widget"
 import { LayoutDashboard, Settings, User } from "lucide-react"
+import Image from "next/image";
 
 import prisma from "@/lib/prisma"
 
@@ -39,8 +40,8 @@ export default async function DashboardPage() {
 
             {/* Sidebar / Navigation (Simplified for now) */}
             <nav className="fixed left-0 top-0 h-full w-20 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col items-center py-8 gap-8 z-50 hidden lg:flex">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
-                    <LayoutDashboard className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 border border-white/10">
+                    <Image src="/logo.png" alt="Logo" width={20} height={20} />
                 </div>
                 <div className="flex-1 flex flex-col gap-6 w-full items-center mt-8">
                     <button className="p-3 rounded-xl bg-white/10 text-white border border-white/10 shadow-inner">
