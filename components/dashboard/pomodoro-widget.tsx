@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Play, Pause, RotateCcw, Clock } from "lucide-react";
+import { useLocale } from "@/components/locale-provider";
 
 export default function PomodoroWidget() {
+    const { t } = useLocale()
     const [minutes, setMinutes] = useState(25);
     const [seconds, setSeconds] = useState(0);
     const [isActive, setIsActive] = useState(false);
@@ -76,7 +78,7 @@ export default function PomodoroWidget() {
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
                         <Clock className="w-5 h-5 text-white" />
                     </div>
-                    <h2 className="text-xl font-bold text-white">Pomodoro</h2>
+                    <h2 className="text-xl font-bold text-white">{t("widgets.pomodoro.title")}</h2>
                 </div>
             </div>
 
@@ -85,20 +87,20 @@ export default function PomodoroWidget() {
                 <button
                     onClick={() => switchMode("work")}
                     className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all ${mode === "work"
-                            ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30"
-                            : "bg-white/5 text-slate-400 hover:bg-white/10"
+                        ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30"
+                        : "bg-white/5 text-slate-400 hover:bg-white/10"
                         }`}
                 >
-                    Travail
+                    {t("widgets.pomodoro.work")}
                 </button>
                 <button
                     onClick={() => switchMode("break")}
                     className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all ${mode === "break"
-                            ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/30"
-                            : "bg-white/5 text-slate-400 hover:bg-white/10"
+                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/30"
+                        : "bg-white/5 text-slate-400 hover:bg-white/10"
                         }`}
                 >
-                    Pause
+                    {t("widgets.pomodoro.break")}
                 </button>
             </div>
 
@@ -136,7 +138,7 @@ export default function PomodoroWidget() {
                                 {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
                             </div>
                             <div className="text-sm text-slate-400 mt-2">
-                                {mode === "work" ? "Temps de travail" : "Temps de pause"}
+                                {mode === "work" ? t("widgets.pomodoro.workSession") : t("widgets.pomodoro.breakSession")}
                             </div>
                         </div>
                     </div>
@@ -148,26 +150,26 @@ export default function PomodoroWidget() {
                 <button
                     onClick={toggleTimer}
                     className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${isActive
-                            ? "bg-white/10 hover:bg-white/15 text-white"
-                            : "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg shadow-orange-500/30"
+                        ? "bg-white/10 hover:bg-white/15 text-white"
+                        : "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg shadow-orange-500/30"
                         }`}
                 >
                     {isActive ? (
                         <>
                             <Pause className="w-5 h-5" />
-                            Pause
+                            {t("widgets.pomodoro.pause")}
                         </>
                     ) : (
                         <>
                             <Play className="w-5 h-5" />
-                            Démarrer
+                            {t("widgets.pomodoro.start")}
                         </>
                     )}
                 </button>
                 <button
                     onClick={resetTimer}
                     className="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all"
-                    title="Réinitialiser"
+                    title={t("widgets.pomodoro.reset")}
                 >
                     <RotateCcw className="w-5 h-5" />
                 </button>

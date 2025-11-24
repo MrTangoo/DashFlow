@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Droplet, Plus, Minus, RotateCcw } from "lucide-react";
+import { useLocale } from "@/components/locale-provider";
 
 export default function WaterTrackerWidget() {
+    const { t } = useLocale()
     const [bottles, setBottles] = useState(0);
     const [loading, setLoading] = useState(true);
     const bottleSize = 1; // 1L per bottle
@@ -78,7 +80,7 @@ export default function WaterTrackerWidget() {
                         <Droplet className="w-6 h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-white">Hydratation</h2>
+                        <h2 className="text-xl font-bold text-white">{t("widgets.waterTracker.title")}</h2>
                         <p className="text-xs text-slate-400 font-medium">
                             {currentLiters.toFixed(1)}L / {dailyGoalLiters}L
                         </p>
@@ -87,7 +89,7 @@ export default function WaterTrackerWidget() {
                 <button
                     onClick={reset}
                     className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all"
-                    title="Réinitialiser"
+                    title={t("widgets.waterTracker.reset")}
                 >
                     <RotateCcw className="w-4 h-4" />
                 </button>
@@ -104,7 +106,7 @@ export default function WaterTrackerWidget() {
                 <div className="flex justify-between mt-2 text-xs text-slate-400">
                     <span>0L</span>
                     <span className={currentLiters >= dailyGoalLiters ? "text-green-400 font-semibold" : ""}>
-                        {currentLiters >= dailyGoalLiters ? "Objectif atteint ! 🎉" : `${Math.round(progress)}%`}
+                        {currentLiters >= dailyGoalLiters ? t("widgets.waterTracker.goalReached") : `${Math.round(progress)}%`}
                     </span>
                     <span>{dailyGoalLiters}L</span>
                 </div>
@@ -118,7 +120,7 @@ export default function WaterTrackerWidget() {
                         {bottles || 0}
                     </div>
                     <div className="text-sm text-slate-400 mt-2">
-                        gourde{bottles !== 1 ? "s" : ""} de {bottleSize}L
+                        {t("widgets.waterTracker.bottles")} ({bottleSize}L)
                     </div>
                 </div>
 
@@ -152,14 +154,14 @@ export default function WaterTrackerWidget() {
                     className="flex-1 py-3 px-6 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     <Minus className="w-5 h-5" />
-                    Retirer
+                    {t("common.delete")}
                 </button>
                 <button
                     onClick={addBottle}
                     className="flex-1 py-3 px-6 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30"
                 >
                     <Plus className="w-5 h-5" />
-                    Ajouter
+                    {t("common.add")}
                 </button>
             </div>
         </div>

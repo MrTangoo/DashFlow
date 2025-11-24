@@ -4,8 +4,10 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useLocale } from "@/components/locale-provider"
 
 export default function LoginPage() {
+    const { t } = useLocale()
     const router = useRouter()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -25,13 +27,13 @@ export default function LoginPage() {
             })
 
             if (result?.error) {
-                setError("Email ou mot de passe incorrect")
+                setError(t("auth.invalidCredentials"))
             } else {
                 router.push("/")
                 router.refresh()
             }
         } catch (error) {
-            setError("Une erreur est survenue")
+            setError(t("auth.errorOccurred"))
         } finally {
             setIsLoading(false)
         }
@@ -44,10 +46,10 @@ export default function LoginPage() {
                     {/* Header */}
                     <div className="text-center space-y-2">
                         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Connexion
+                            {t("auth.loginTitle")}
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400">
-                            Connectez-vous à votre compte
+                            {t("auth.loginSubtitle")}
                         </p>
                     </div>
 
@@ -65,7 +67,7 @@ export default function LoginPage() {
                                 htmlFor="email"
                                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Email
+                                {t("auth.email")}
                             </label>
                             <input
                                 id="email"
@@ -74,7 +76,7 @@ export default function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                                placeholder="votre@email.com"
+                                placeholder={t("auth.emailPlaceholder")}
                             />
                         </div>
 
@@ -83,7 +85,7 @@ export default function LoginPage() {
                                 htmlFor="password"
                                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Mot de passe
+                                {t("auth.password")}
                             </label>
                             <input
                                 id="password"
@@ -92,7 +94,7 @@ export default function LoginPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                                placeholder="••••••••"
+                                placeholder={t("auth.passwordPlaceholder")}
                             />
                         </div>
 
@@ -123,10 +125,10 @@ export default function LoginPage() {
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                         ></path>
                                     </svg>
-                                    Connexion...
+                                    {t("auth.loggingIn")}
                                 </span>
                             ) : (
-                                "Se connecter"
+                                t("auth.signIn")
                             )}
                         </button>
                     </form>
@@ -139,7 +141,7 @@ export default function LoginPage() {
                             </div>
                             <div className="relative flex justify-center text-sm">
                                 <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
-                                    ou continuer avec
+                                    {t("auth.orContinueWith")}
                                 </span>
                             </div>
                         </div>
@@ -166,12 +168,12 @@ export default function LoginPage() {
                     {/* Register Link */}
                     <div className="text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Pas encore de compte?{" "}
+                            {t("auth.noAccount")}{" "}
                             <Link
                                 href="/register"
                                 className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                             >
-                                Créer un compte
+                                {t("auth.createAccount")}
                             </Link>
                         </p>
                     </div>

@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-
 import { useRouter } from "next/navigation"
 import { Plus, StickyNote, Trash2, PenLine, Check, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { useLocale } from "@/components/locale-provider"
 
 interface Note {
     id: string
@@ -15,6 +15,7 @@ interface Note {
 }
 
 export default function NotesWidget() {
+    const { t } = useLocale()
     const [notes, setNotes] = useState<Note[]>([])
     const [newNote, setNewNote] = useState("")
     const [loading, setLoading] = useState(true)
@@ -127,8 +128,8 @@ export default function NotesWidget() {
                     <StickyNote className="w-6 h-6" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-bold text-white">Notes</h2>
-                    <p className="text-xs text-slate-400 font-medium">{notes.length} notes</p>
+                    <h2 className="text-xl font-bold text-white">{t("widgets.notes.title")}</h2>
+                    <p className="text-xs text-slate-400 font-medium">{notes.length} {t("widgets.notes.notes")}</p>
                 </div>
             </div>
 
@@ -137,7 +138,7 @@ export default function NotesWidget() {
                     type="text"
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    placeholder="Une idée rapide ?"
+                    placeholder={t("widgets.notes.notePlaceholder")}
                     className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3.5 pl-11 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-sm placeholder:text-white/30"
                 />
                 <Plus className="w-5 h-5 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors group-focus-within/input:text-blue-400" />
@@ -154,15 +155,15 @@ export default function NotesWidget() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center h-40 gap-3 text-white/30">
                         <div className="w-6 h-6 border-2 border-white/20 border-t-blue-500 rounded-full animate-spin" />
-                        <span className="text-sm">Chargement...</span>
+                        <span className="text-sm">{t("common.loading")}</span>
                     </div>
                 ) : notes.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-40 text-center">
                         <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3">
                             <StickyNote className="w-6 h-6 text-white/20" />
                         </div>
-                        <p className="text-white/40 text-sm">Aucune note</p>
-                        <p className="text-white/20 text-xs mt-1">Capturez vos idées ici</p>
+                        <p className="text-white/40 text-sm">{t("widgets.notes.noNotes")}</p>
+                        <p className="text-white/20 text-xs mt-1">{t("widgets.notes.captureIdeas")}</p>
                     </div>
                 ) : (
                     <AnimatePresence initial={false}>

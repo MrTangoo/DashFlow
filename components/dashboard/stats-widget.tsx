@@ -2,6 +2,7 @@
 
 import { BarChart3, TrendingUp, CheckCircle2 } from "lucide-react"
 import { motion } from "framer-motion"
+import { useLocale } from "@/components/locale-provider"
 
 interface Task {
     id: string
@@ -14,12 +15,17 @@ interface StatsWidgetProps {
 }
 
 export default function StatsWidget({ tasks }: StatsWidgetProps) {
+    const { t, locale } = useLocale()
     const completedCount = tasks.filter((t) => t.completed).length
     const totalTasks = tasks.length
     const completionRate = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0
 
     // Calculate chart data based on tasks created in the last 7 days
-    const days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"]
+    const days = locale === "fr"
+        ? ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"]
+        : locale === "de"
+            ? ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+            : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     const today = new Date()
     const last7Days = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(today)
@@ -71,8 +77,8 @@ export default function StatsWidget({ tasks }: StatsWidgetProps) {
                     <BarChart3 className="w-6 h-6" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-bold text-white">Aperçu</h2>
-                    <p className="text-xs text-slate-400 font-medium">Vos performances</p>
+                    <h2 className="text-xl font-bold text-white">{t("widgets.stats.title")}</h2>
+                    <p className="text-xs text-slate-400 font-medium">{t("widgets.stats.subtitle")}</p>
                 </div>
             </div>
 
@@ -80,18 +86,18 @@ export default function StatsWidget({ tasks }: StatsWidgetProps) {
                 <div className="bg-white/5 rounded-2xl p-4 border border-white/5 hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-2 text-emerald-400 mb-2">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span className="text-xs font-medium uppercase tracking-wider">Complétées</span>
+                        <span className="text-xs font-medium uppercase tracking-wider">{t("widgets.stats.completed")}</span>
                     </div>
                     <div className="text-2xl font-bold text-white">{completedCount}</div>
-                    <div className="text-xs text-white/40 mt-1">sur {totalTasks} tâches</div>
+                    <div className="text-xs text-white/40 mt-1">{t("widgets.stats.outOf")} {totalTasks} {t("widgets.stats.tasks")}</div>
                 </div>
                 <div className="bg-white/5 rounded-2xl p-4 border border-white/5 hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-2 text-blue-400 mb-2">
                         <TrendingUp className="w-4 h-4" />
-                        <span className="text-xs font-medium uppercase tracking-wider">Taux</span>
+                        <span className="text-xs font-medium uppercase tracking-wider">{t("widgets.stats.rate")}</span>
                     </div>
                     <div className="text-2xl font-bold text-white">{completionRate}%</div>
-                    <div className="text-xs text-white/40 mt-1">de réussite</div>
+                    <div className="text-xs text-white/40 mt-1">{t("widgets.stats.successRate")}</div>
                 </div>
             </div>
 

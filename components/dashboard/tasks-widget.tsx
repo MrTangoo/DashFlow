@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-
 import { useRouter } from "next/navigation"
 import { Plus, CheckCircle2, Circle, Trash2, ListTodo } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { useLocale } from "@/components/locale-provider"
 
 interface Task {
     id: string
@@ -15,6 +15,7 @@ interface Task {
 }
 
 export default function TasksWidget() {
+    const { t } = useLocale()
     const [tasks, setTasks] = useState<Task[]>([])
     const [newTask, setNewTask] = useState("")
     const [loading, setLoading] = useState(true)
@@ -118,8 +119,8 @@ export default function TasksWidget() {
                         <ListTodo className="w-6 h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-white">Tâches</h2>
-                        <p className="text-xs text-slate-400 font-medium">{completedCount}/{tasks.length} complétées</p>
+                        <h2 className="text-xl font-bold text-white">{t("widgets.tasks.title")}</h2>
+                        <p className="text-xs text-slate-400 font-medium">{completedCount}/{tasks.length} {t("widgets.tasks.completed")}</p>
                     </div>
                 </div>
                 {/* Circular Progress */}
@@ -136,7 +137,7 @@ export default function TasksWidget() {
                     type="text"
                     value={newTask}
                     onChange={(e) => setNewTask(e.target.value)}
-                    placeholder="Ajouter une tâche..."
+                    placeholder={t("widgets.tasks.taskPlaceholder")}
                     className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3.5 pl-11 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all text-sm placeholder:text-white/30"
                 />
                 <Plus className="w-5 h-5 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors group-focus-within/input:text-purple-400" />
@@ -153,15 +154,15 @@ export default function TasksWidget() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center h-40 gap-3 text-white/30">
                         <div className="w-6 h-6 border-2 border-white/20 border-t-purple-500 rounded-full animate-spin" />
-                        <span className="text-sm">Chargement...</span>
+                        <span className="text-sm">{t("common.loading")}</span>
                     </div>
                 ) : tasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-40 text-center">
                         <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3">
                             <ListTodo className="w-6 h-6 text-white/20" />
                         </div>
-                        <p className="text-white/40 text-sm">Aucune tâche en cours</p>
-                        <p className="text-white/20 text-xs mt-1">Ajoutez-en une pour commencer</p>
+                        <p className="text-white/40 text-sm">{t("widgets.tasks.noTasks")}</p>
+                        <p className="text-white/20 text-xs mt-1">{t("widgets.tasks.addTaskHint")}</p>
                     </div>
                 ) : (
                     <AnimatePresence initial={false}>

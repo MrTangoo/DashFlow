@@ -1,0 +1,90 @@
+"use client";
+
+import { useLocale } from "@/components/locale-provider";
+import TasksWidget from "@/components/dashboard/tasks-widget";
+import NotesWidget from "@/components/dashboard/notes-widget";
+import StatsWidget from "@/components/dashboard/stats-widget";
+import DetailedWeatherWidget from "@/components/dashboard/detailed-weather-widget";
+import PomodoroWidget from "@/components/dashboard/pomodoro-widget";
+import WaterTrackerWidget from "@/components/dashboard/water-tracker-widget";
+
+export default function DashboardContent({ session, tasks }: any) {
+    const { t, locale } = useLocale();
+
+    const currentDate = new Date().toLocaleDateString(locale === "de" ? "de-DE" : locale === "en" ? "en-US" : "fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+    });
+
+    return (
+        <>
+            {/* Header */}
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+                <div className="flex items-center gap-4">
+                    {/* Profile Picture */}
+                    {session.user?.image && (
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/10 shadow-xl bg-slate-800 flex-shrink-0">
+                            {session.user.image.startsWith('/api/') ? (
+                                <img
+                                    src={session.user.image}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <img
+                                    src={session.user.image}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
+                        </div>
+                    )}
+                    <div>
+                        <p className="text-blue-400 font-medium mb-2 uppercase tracking-wider text-sm flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                            {currentDate}
+                        </p>
+                        <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                            {t("dashboard.welcome")}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">{session.user?.name || t("common.user")}</span>
+                        </h1>
+                        <p className="text-slate-400 mt-2 text-lg">{t("dashboard.subtitle")}</p>
+                    </div>
+                </div>
+            </header>
+
+            {/* Dashboard Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
+                {/* Tasks Widget - Spans 1 column */}
+                <div className="h-full">
+                    <TasksWidget />
+                </div>
+
+                {/* Notes Widget - Spans 1 column */}
+                <div className="h-full">
+                    <NotesWidget />
+                </div>
+
+                {/* Stats Widget */}
+                <div className="md:col-span-1 h-[400px]">
+                    <StatsWidget tasks={tasks} />
+                </div>
+
+                {/* Pomodoro Widget */}
+                <div className="md:col-span-1 h-[450px]">
+                    <PomodoroWidget />
+                </div>
+
+                {/* Water Tracker Widget */}
+                <div className="md:col-span-1 h-[450px]">
+                    <WaterTrackerWidget />
+                </div>
+
+                {/* Detailed Weather Widget */}
+                <div className="md:col-span-1 h-[450px]">
+                    <DetailedWeatherWidget />
+                </div>
+            </div>
+        </>
+    );
+}

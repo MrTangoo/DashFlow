@@ -4,8 +4,10 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
+import { useLocale } from "@/components/locale-provider"
 
 export default function RegisterPage() {
+    const { t } = useLocale()
     const router = useRouter()
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
@@ -20,12 +22,12 @@ export default function RegisterPage() {
 
         // Validation
         if (password !== confirmPassword) {
-            setError("Les mots de passe ne correspondent pas")
+            setError(t("profile.passwordsDoNotMatch"))
             return
         }
 
-        if (password.length < 6) {
-            setError("Le mot de passe doit contenir au moins 6 caractères")
+        if (password.length < 8) {
+            setError(t("profile.passwordMinLength"))
             return
         }
 
@@ -48,7 +50,7 @@ export default function RegisterPage() {
             const data = await response.json()
 
             if (!response.ok) {
-                setError(data.error || "Une erreur est survenue")
+                setError(data.error || t("auth.errorOccurred"))
                 setIsLoading(false)
                 return
             }
@@ -61,14 +63,14 @@ export default function RegisterPage() {
             })
 
             if (result?.error) {
-                setError("Compte créé mais erreur de connexion")
+                setError(t("auth.errorOccurred"))
                 setIsLoading(false)
             } else {
                 router.push("/")
                 router.refresh()
             }
         } catch (error) {
-            setError("Une erreur est survenue")
+            setError(t("auth.errorOccurred"))
             setIsLoading(false)
         }
     }
@@ -80,10 +82,10 @@ export default function RegisterPage() {
                     {/* Header */}
                     <div className="text-center space-y-2">
                         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                            Inscription
+                            {t("auth.registerTitle")}
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400">
-                            Créez votre compte gratuitement
+                            {t("auth.registerSubtitle")}
                         </p>
                     </div>
 
@@ -101,7 +103,7 @@ export default function RegisterPage() {
                                 htmlFor="name"
                                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Nom
+                                {t("auth.name")}
                             </label>
                             <input
                                 id="name"
@@ -109,7 +111,7 @@ export default function RegisterPage() {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
-                                placeholder="Votre nom"
+                                placeholder={t("auth.namePlaceholder")}
                             />
                         </div>
 
@@ -118,7 +120,7 @@ export default function RegisterPage() {
                                 htmlFor="email"
                                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Email
+                                {t("auth.email")}
                             </label>
                             <input
                                 id="email"
@@ -127,7 +129,7 @@ export default function RegisterPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
-                                placeholder="votre@email.com"
+                                placeholder={t("auth.emailPlaceholder")}
                             />
                         </div>
 
@@ -136,7 +138,7 @@ export default function RegisterPage() {
                                 htmlFor="password"
                                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Mot de passe
+                                {t("auth.password")}
                             </label>
                             <input
                                 id="password"
@@ -145,7 +147,7 @@ export default function RegisterPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
-                                placeholder="••••••••"
+                                placeholder={t("auth.passwordPlaceholder")}
                             />
                         </div>
 
@@ -154,7 +156,7 @@ export default function RegisterPage() {
                                 htmlFor="confirmPassword"
                                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Confirmer le mot de passe
+                                {t("auth.confirmPassword")}
                             </label>
                             <input
                                 id="confirmPassword"
@@ -163,7 +165,7 @@ export default function RegisterPage() {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
-                                placeholder="••••••••"
+                                placeholder={t("auth.passwordPlaceholder")}
                             />
                         </div>
 
@@ -194,10 +196,10 @@ export default function RegisterPage() {
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                         ></path>
                                     </svg>
-                                    Création du compte...
+                                    {t("auth.signingUp")}
                                 </span>
                             ) : (
-                                "Créer mon compte"
+                                t("auth.createAccount")
                             )}
                         </button>
                     </form>
@@ -210,7 +212,7 @@ export default function RegisterPage() {
                             </div>
                             <div className="relative flex justify-center text-sm">
                                 <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
-                                    ou s'inscrire avec
+                                    {t("auth.orContinueWith")}
                                 </span>
                             </div>
                         </div>
@@ -237,12 +239,12 @@ export default function RegisterPage() {
                     {/* Login Link */}
                     <div className="text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Déjà un compte?{" "}
+                            {t("auth.hasAccount")}{" "}
                             <Link
                                 href="/login"
                                 className="font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
                             >
-                                Se connecter
+                                {t("auth.signIn")}
                             </Link>
                         </p>
                     </div>

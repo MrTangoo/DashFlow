@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
-    const city = searchParams.get("city") || "Paris" // Default to Paris if no city provided
+    const city = searchParams.get("city") || "Paris"
+    const lang = searchParams.get("lang") || "fr"
 
     const apiKey = process.env.OPEN_WEATHER_API
 
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
 
     try {
         const res = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=fr&appid=${apiKey}`
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=${lang}&appid=${apiKey}`
         )
 
         if (!res.ok) {

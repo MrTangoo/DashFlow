@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Search, Wind, Droplets, Thermometer, CloudSun, CloudRain, Sun, Cloud, CloudLightning, CloudSnow, Loader2, MapPin } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useLocale } from "@/components/locale-provider"
 
 interface WeatherData {
     main: {
@@ -25,6 +26,7 @@ interface WeatherData {
 }
 
 export default function DetailedWeatherWidget() {
+    const { t, locale } = useLocale()
     const [weather, setWeather] = useState<WeatherData | null>(null)
     const [loading, setLoading] = useState(true)
     const [searchCity, setSearchCity] = useState("")
@@ -32,22 +34,22 @@ export default function DetailedWeatherWidget() {
 
     useEffect(() => {
         fetchWeather("Paris")
-    }, [])
+    }, [locale])
 
     const fetchWeather = async (city: string) => {
         setLoading(true)
         setError("")
         try {
-            const res = await fetch(`/api/weather?city=${encodeURIComponent(city)}`)
+            const res = await fetch(`/api/weather?city=${encodeURIComponent(city)}&lang=${locale}`)
             if (res.ok) {
                 const data = await res.json()
                 setWeather(data)
             } else {
-                setError("Ville introuvable")
+                setError(t("widgets.weather.cityNotFound"))
             }
         } catch (error) {
             console.error("Failed to fetch weather", error)
-            setError("Erreur de connexion")
+            setError(t("widgets.weather.connectionError"))
         } finally {
             setLoading(false)
         }
@@ -87,14 +89,14 @@ export default function DetailedWeatherWidget() {
             <div className="flex items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-2 text-white/60">
                     <MapPin className="w-4 h-4" />
-                    <span className="text-sm font-medium uppercase tracking-wider">Météo</span>
+                    <span className="text-sm font-medium uppercase tracking-wider">{t("widgets.weather.title")}</span>
                 </div>
                 <form onSubmit={handleSearch} className="relative group/input flex-1 max-w-[200px]">
                     <input
                         type="text"
                         value={searchCity}
                         onChange={(e) => setSearchCity(e.target.value)}
-                        placeholder="Rechercher..."
+                        placeholder={t("common.search")}
                         className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 pl-9 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-white/30"
                     />
                     <Search className="w-4 h-4 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -136,17 +138,17 @@ export default function DetailedWeatherWidget() {
                                 <div className="bg-white/5 rounded-2xl p-3 border border-white/5 flex flex-col items-center gap-2">
                                     <Wind className="w-5 h-5 text-slate-400" />
                                     <span className="text-sm font-bold text-white">{Math.round(weather.wind.speed * 3.6)} km/h</span>
-                                    <span className="text-[10px] text-white/40 uppercase">Vent</span>
+                                    <span className="text-[10px] text-white/40 uppercase">{t("widgets.weather.wind")}</span>
                                 </div>
                                 <div className="bg-white/5 rounded-2xl p-3 border border-white/5 flex flex-col items-center gap-2">
                                     <Droplets className="w-5 h-5 text-blue-400" />
                                     <span className="text-sm font-bold text-white">{weather.main.humidity}%</span>
-                                    <span className="text-[10px] text-white/40 uppercase">Humidité</span>
+                                    <span className="text-[10px] text-white/40 uppercase">{t("widgets.weather.humidity")}</span>
                                 </div>
                                 <div className="bg-white/5 rounded-2xl p-3 border border-white/5 flex flex-col items-center gap-2">
                                     <Thermometer className="w-5 h-5 text-red-400" />
                                     <span className="text-sm font-bold text-white">{Math.round(weather.main.feels_like)}°</span>
-                                    <span className="text-[10px] text-white/40 uppercase">Ressenti</span>
+                                    <span className="text-[10px] text-white/40 uppercase">{t("widgets.weather.feelsLike")}</span>
                                 </div>
                             </div>
                         </div>
