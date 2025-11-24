@@ -149,6 +149,17 @@
             "reset": "Reset"
         }
     },
+    "history": {
+        "title": "Task History",
+        "subtitle": "View and manage all your past and present tasks.",
+        "searchPlaceholder": "Search tasks...",
+        "filterAll": "All",
+        "filterCompleted": "Completed",
+        "filterActive": "Active",
+        "sortByDate": "Date",
+        "sortByStatus": "Status",
+        "noTasksFound": "No tasks found"
+    },
     "errors": {
         "unauthorized": "Unauthorized",
         "notFound": "Not Found",

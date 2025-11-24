@@ -11,19 +11,10 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-
-        // Get all incomplete tasks (from any day) OR completed tasks from today only
+        // Get all tasks for the user
         const tasks = await prisma.task.findMany({
             where: {
-                userId: session.user.id,
-                OR: [
-                    { completed: false }, // All incomplete tasks
-                    {
-                        completed: true,
-                        date: today // Only today's completed tasks
-                    }
-                ]
+                userId: session.user.id
             },
             orderBy: { createdAt: "desc" },
         })

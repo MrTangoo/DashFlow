@@ -3,6 +3,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import DashboardLayoutClient from "./layout-client";
 
+import prisma from "@/lib/prisma";
+
 export default async function DashboardLayout({
     children,
 }: {
@@ -14,5 +16,10 @@ export default async function DashboardLayout({
         redirect("/login");
     }
 
-    return <DashboardLayoutClient>{children}</DashboardLayoutClient>;
+    const tasks = await prisma.task.findMany({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+    })
+
+    return <DashboardLayoutClient tasks={tasks}>{children}</DashboardLayoutClient>;
 }

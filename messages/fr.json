@@ -149,6 +149,17 @@
             "reset": "Réinitialiser"
         }
     },
+    "history": {
+        "title": "Historique des Tâches",
+        "subtitle": "Consultez et gérez toutes vos tâches passées et présentes.",
+        "searchPlaceholder": "Rechercher une tâche...",
+        "filterAll": "Toutes",
+        "filterCompleted": "Terminées",
+        "filterActive": "En cours",
+        "sortByDate": "Date",
+        "sortByStatus": "Statut",
+        "noTasksFound": "Aucune tâche trouvée"
+    },
     "errors": {
         "unauthorized": "Non autorisé",
         "notFound": "Non trouvé",

@@ -149,6 +149,17 @@
             "reset": "Zurücksetzen"
         }
     },
+    "history": {
+        "title": "Aufgabenverlauf",
+        "subtitle": "Sehen und verwalten Sie alle Ihre Aufgaben.",
+        "searchPlaceholder": "Aufgaben suchen...",
+        "filterAll": "Alle",
+        "filterCompleted": "Erledigt",
+        "filterActive": "Aktiv",
+        "sortByDate": "Datum",
+        "sortByStatus": "Status",
+        "noTasksFound": "Keine Aufgaben gefunden"
+    },
     "errors": {
         "unauthorized": "Nicht autorisiert",
         "notFound": "Nicht gefunden",

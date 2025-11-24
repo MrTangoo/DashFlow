@@ -1,23 +1,21 @@
 "use client"
 
-import { BarChart3, TrendingUp, CheckCircle2 } from "lucide-react"
+import { BarChart3, TrendingUp, CheckCircle2, History } from "lucide-react"
 import { motion } from "framer-motion"
 import { useLocale } from "@/components/locale-provider"
+import { useTasks } from "@/components/providers/tasks-provider"
+import Link from "next/link"
 
-interface Task {
-    id: string
-    completed: boolean
-    createdAt: Date
-}
-
-interface StatsWidgetProps {
-    tasks: Task[]
-}
-
-export default function StatsWidget({ tasks }: StatsWidgetProps) {
+export default function StatsWidget() {
     const { t, locale } = useLocale()
-    const completedCount = tasks.filter((t) => t.completed).length
-    const totalTasks = tasks.length
+    const { tasks } = useTasks()
+
+    // Calculate stats for TODAY only
+    const today = new Date().toISOString().split('T')[0]
+    const todaysTasks = tasks.filter(task => task.date === today)
+
+    const totalTasks = todaysTasks.length
+    const completedCount = todaysTasks.filter(t => t.completed).length
     const completionRate = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0
 
     // Calculate chart data based on tasks created in the last 7 days
@@ -26,60 +24,48 @@ export default function StatsWidget({ tasks }: StatsWidgetProps) {
         : locale === "de"
             ? ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
             : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-    const today = new Date()
+
     const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(today)
+        const d = new Date()
         d.setDate(d.getDate() - (6 - i))
         return d
     })
 
     const chartData = last7Days.map((date) => {
         const dayName = days[date.getDay()]
+        const dateString = date.toISOString().split('T')[0]
+
         // Count tasks created on this day
-        const tasksOnDay = tasks.filter(task => {
-            const taskDate = new Date(task.createdAt)
-            return taskDate.getDate() === date.getDate() &&
-                taskDate.getMonth() === date.getMonth() &&
-                taskDate.getFullYear() === date.getFullYear()
-        }).length
+        const tasksOnDay = tasks.filter(task => task.date === dateString).length
 
-        // For this demo, let's just show activity based on tasks created
-        // In a real app, you might want "tasks completed" on that day
-        // Let's use a simple value for now to ensure bars show up if there are tasks
-        // Or we can keep the mock data if the user prefers, but they asked for "live"
-        // Let's try to make it somewhat real or at least consistent.
-
-        // If no tasks, return 0. If tasks, normalize to some height or just count.
-        // To make it look good with few tasks, let's just use the count * 20 for height % (capped at 100)
+        // Scale value for visual representation (cap at 100 for bar height)
+        // If we have tasks, we show relative height. If max tasks in period is small, we scale up.
+        // For simplicity, let's just use count * 20 capped at 100.
         const value = Math.min(tasksOnDay * 20, 100)
 
         return { day: dayName, value: value, count: tasksOnDay }
     })
-
-    // Fallback to mock data if no tasks exist yet, so the chart isn't empty
-    const displayData = totalTasks === 0 ? [
-        { day: "Lun", value: 40 },
-        { day: "Mar", value: 70 },
-        { day: "Mer", value: 50 },
-        { day: "Jeu", value: 90 },
-        { day: "Ven", value: 60 },
-        { day: "Sam", value: 30 },
-        { day: "Dim", value: 80 },
-    ] : chartData
 
     return (
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl h-full flex flex-col relative overflow-hidden group">
             {/* Decorative background blur */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-emerald-500/10 rounded-full blur-[60px] -z-10 transition-all duration-500 group-hover:bg-emerald-500/20" />
 
-            <div className="flex items-center gap-3 mb-6">
-                <div className="p-2.5 bg-emerald-500/20 rounded-xl text-emerald-400">
-                    <BarChart3 className="w-6 h-6" />
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-emerald-500/20 rounded-xl text-emerald-400">
+                        <BarChart3 className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-white">{t("widgets.stats.title")}</h2>
+                        <p className="text-xs text-slate-400 font-medium">{t("widgets.stats.subtitle")}</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 className="text-xl font-bold text-white">{t("widgets.stats.title")}</h2>
-                    <p className="text-xs text-slate-400 font-medium">{t("widgets.stats.subtitle")}</p>
-                </div>
+                <Link href="/dashboard/history">
+                    <button className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-all" title="History">
+                        <History className="w-5 h-5" />
+                    </button>
+                </Link>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -103,7 +89,7 @@ export default function StatsWidget({ tasks }: StatsWidgetProps) {
 
             <div className="flex-1 flex flex-col justify-end">
                 <div className="flex justify-between gap-2 h-32 w-full px-2">
-                    {displayData.map((item, index) => (
+                    {chartData.map((item, index) => (
                         <div key={index} className="flex flex-col items-center gap-2 flex-1 group/bar">
                             <div className="w-full relative flex-1 flex items-end">
                                 <motion.div
@@ -113,7 +99,7 @@ export default function StatsWidget({ tasks }: StatsWidgetProps) {
                                     className="w-full bg-white/10 rounded-t-lg group-hover/bar:bg-emerald-500/50 transition-colors relative"
                                 >
                                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                        {item.value}%
+                                        {item.count} tasks
                                     </div>
                                 </motion.div>
                             </div>

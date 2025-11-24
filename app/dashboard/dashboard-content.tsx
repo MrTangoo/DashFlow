@@ -8,7 +8,7 @@ import DetailedWeatherWidget from "@/components/dashboard/detailed-weather-widge
 import PomodoroWidget from "@/components/dashboard/pomodoro-widget";
 import WaterTrackerWidget from "@/components/dashboard/water-tracker-widget";
 
-export default function DashboardContent({ session, tasks }: any) {
+export default function DashboardContent({ session }: { session: any }) {
     const { t, locale } = useLocale();
 
     const currentDate = new Date().toLocaleDateString(locale === "de" ? "de-DE" : locale === "en" ? "en-US" : "fr-FR", {
@@ -67,7 +67,7 @@ export default function DashboardContent({ session, tasks }: any) {
 
                 {/* Stats Widget */}
                 <div className="md:col-span-1 h-[400px]">
-                    <StatsWidget tasks={tasks} />
+                    <StatsWidget />
                 </div>
 
                 {/* Pomodoro Widget */}

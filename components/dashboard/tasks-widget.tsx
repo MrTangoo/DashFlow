@@ -1,112 +1,42 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { Plus, CheckCircle2, Circle, Trash2, ListTodo } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { useLocale } from "@/components/locale-provider"
-
-interface Task {
-    id: string
-    title: string
-    completed: boolean
-    clientId?: string
-}
+import { useTasks } from "@/components/providers/tasks-provider"
 
 export default function TasksWidget() {
     const { t } = useLocale()
-    const [tasks, setTasks] = useState<Task[]>([])
+    const { tasks, loading, addTask: addTaskContext, toggleTask: toggleTaskContext, deleteTask: deleteTaskContext } = useTasks()
     const [newTask, setNewTask] = useState("")
-    const [loading, setLoading] = useState(true)
-    const router = useRouter()
-
-    useEffect(() => {
-        fetchTasks()
-    }, [])
-
-    const fetchTasks = async () => {
-        try {
-            const res = await fetch("/api/tasks")
-            if (res.ok) {
-                const data = await res.json()
-                setTasks(data)
-            }
-        } catch (error) {
-            console.error("Failed to fetch tasks", error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const addTask = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!newTask.trim()) return
-
-        const tempId = Date.now().toString()
-        const optimisticTask = { id: tempId, title: newTask, completed: false, clientId: tempId }
-        setTasks([optimisticTask, ...tasks])
+        await addTaskContext(newTask)
         setNewTask("")
-
-        try {
-            const res = await fetch("/api/tasks", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: optimisticTask.title }),
-            })
-
-            if (res.ok) {
-                const createdTask = await res.json()
-                setTasks((prev) => prev.map((t) => (t.id === tempId ? { ...createdTask, clientId: tempId } : t)))
-                router.refresh()
-            } else {
-                setTasks((prev) => prev.filter((t) => t.id !== tempId))
-            }
-        } catch (error) {
-            console.error("Failed to add task", error)
-            setTasks((prev) => prev.filter((t) => t.id !== tempId))
-        }
     }
 
     const toggleTask = async (id: string, completed: boolean) => {
-        setTasks((prev) =>
-            prev.map((t) => (t.id === id ? { ...t, completed: !completed } : t))
-        )
-
-        try {
-            await fetch(`/api/tasks/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ completed: !completed }),
-            })
-            router.refresh()
-        } catch (error) {
-            console.error("Failed to update task", error)
-            setTasks((prev) =>
-                prev.map((t) => (t.id === id ? { ...t, completed } : t))
-            )
-        }
+        await toggleTaskContext(id, completed)
     }
 
     const deleteTask = async (id: string) => {
-        const taskToDelete = tasks.find((t) => t.id === id)
-        setTasks((prev) => prev.filter((t) => t.id !== id))
-
-        try {
-            await fetch(`/api/tasks/${id}`, {
-                method: "DELETE",
-            })
-            router.refresh()
-        } catch (error) {
-            console.error("Failed to delete task", error)
-            if (taskToDelete) {
-                setTasks((prev) => [...prev, taskToDelete])
-            }
-        }
+        await deleteTaskContext(id)
     }
 
-    const completedCount = tasks.filter(t => t.completed).length
-    const progress = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0
+    // Filter tasks: Show tasks created today OR incomplete tasks
+    // Hide completed tasks from previous days
+    const today = new Date().toISOString().split('T')[0]
+    const filteredTasks = tasks.filter(task => {
+        const isToday = task.date === today
+        return isToday || !task.completed
+    })
+
+    const completedCount = filteredTasks.filter(t => t.completed).length
+    const progress = filteredTasks.length > 0 ? (completedCount / filteredTasks.length) * 100 : 0
 
     return (
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl h-full flex flex-col relative overflow-hidden group">
@@ -120,7 +50,7 @@ export default function TasksWidget() {
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-white">{t("widgets.tasks.title")}</h2>
-                        <p className="text-xs text-slate-400 font-medium">{completedCount}/{tasks.length} {t("widgets.tasks.completed")}</p>
+                        <p className="text-xs text-slate-400 font-medium">{completedCount}/{filteredTasks.length} {t("widgets.tasks.completed")}</p>
                     </div>
                 </div>
                 {/* Circular Progress */}
@@ -156,7 +86,7 @@ export default function TasksWidget() {
                         <div className="w-6 h-6 border-2 border-white/20 border-t-purple-500 rounded-full animate-spin" />
                         <span className="text-sm">{t("common.loading")}</span>
                     </div>
-                ) : tasks.length === 0 ? (
+                ) : filteredTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-40 text-center">
                         <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3">
                             <ListTodo className="w-6 h-6 text-white/20" />
@@ -165,8 +95,8 @@ export default function TasksWidget() {
                         <p className="text-white/20 text-xs mt-1">{t("widgets.tasks.addTaskHint")}</p>
                     </div>
                 ) : (
-                    <AnimatePresence initial={false}>
-                        {tasks.map((task) => (
+                    <AnimatePresence initial={false} mode="popLayout">
+                        {filteredTasks.map((task) => (
                             <motion.div
                                 key={task.clientId || task.id}
                                 initial={{ opacity: 0, y: 10 }}

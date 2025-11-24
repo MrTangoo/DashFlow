@@ -11,11 +11,6 @@ export default async function DashboardPage() {
         redirect("/login")
     }
 
-    const tasks = await prisma.task.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: "desc" },
-    })
-
-    return <DashboardContent session={session} tasks={tasks} />
+    return <DashboardContent session={session} />
 }
 
