@@ -33,14 +33,44 @@ export default function DetailedWeatherWidget() {
     const [error, setError] = useState("")
 
     useEffect(() => {
-        fetchWeather("Paris")
+        if ("geolocation" in navigator) {
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchWeather({
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    })
+                },
+                (error) => {
+                    console.warn("Geolocation error:", error.code, error.message)
+                    // Fallback to Paris if location fails
+                    fetchWeather({ city: "Paris" })
+                },
+                options
+            )
+        } else {
+            fetchWeather({ city: "Paris" })
+        }
     }, [locale])
 
-    const fetchWeather = async (city: string) => {
+    const fetchWeather = async (params: { city?: string; lat?: number; lon?: number }) => {
         setLoading(true)
         setError("")
         try {
-            const res = await fetch(`/api/weather?city=${encodeURIComponent(city)}&lang=${locale}`)
+            let url = `/api/weather?lang=${locale}`
+            if (params.lat && params.lon) {
+                url += `&lat=${params.lat}&lon=${params.lon}`
+            } else if (params.city) {
+                url += `&city=${encodeURIComponent(params.city)}`
+            }
+
+            const res = await fetch(url)
             if (res.ok) {
                 const data = await res.json()
                 setWeather(data)
@@ -58,7 +88,7 @@ export default function DetailedWeatherWidget() {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault()
         if (searchCity.trim()) {
-            fetchWeather(searchCity)
+            fetchWeather({ city: searchCity })
         }
     }
 

@@ -2,7 +2,9 @@ import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
-    const city = searchParams.get("city") || "Paris"
+    const lat = searchParams.get("lat")
+    const lon = searchParams.get("lon")
+    const city = searchParams.get("city")
     const lang = searchParams.get("lang") || "fr"
 
     const apiKey = process.env.OPEN_WEATHER_API
@@ -12,9 +14,15 @@ export async function GET(request: Request) {
     }
 
     try {
-        const res = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=${lang}&appid=${apiKey}`
-        )
+        let url = `https://api.openweathermap.org/data/2.5/weather?units=metric&lang=${lang}&appid=${apiKey}`
+
+        if (lat && lon) {
+            url += `&lat=${lat}&lon=${lon}`
+        } else {
+            url += `&q=${encodeURIComponent(city || "Paris")}`
+        }
+
+        const res = await fetch(url)
 
         if (!res.ok) {
             return NextResponse.json({ error: "Failed to fetch weather" }, { status: res.status })
