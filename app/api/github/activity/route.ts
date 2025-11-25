@@ -38,51 +38,36 @@ export async function GET() {
         const userData = await userResponse.json()
         const username = userData.login
 
-        // Fetch recent events
-        const eventsResponse = await fetch(`https://api.github.com/users/${username}/events?per_page=100`, {
-            headers: {
-                Authorization: `Bearer ${account.access_token}`,
-                Accept: "application/vnd.github.v3+json"
-            }
-        })
+        // Get today's date in ISO format (YYYY-MM-DD)
+        const today = new Date().toISOString().split('T')[0]
 
-        if (!eventsResponse.ok) {
-            return NextResponse.json({ error: "Failed to fetch GitHub events" }, { status: eventsResponse.status })
+        // Use GitHub Search API to get commits from today
+        const searchResponse = await fetch(
+            `https://api.github.com/search/commits?q=author:${username}+committer-date:${today}&per_page=100`,
+            {
+                headers: {
+                    Authorization: `Bearer ${account.access_token}`,
+                    Accept: "application/vnd.github.cloak-preview+json" // Required for commit search
+                }
+            }
+        )
+
+        const commits: any[] = []
+        if (searchResponse.ok) {
+            const searchData = await searchResponse.json()
+
+            // Extract commit details from search results
+            for (const item of (searchData.items || []).slice(0, 10)) {
+                commits.push({
+                    message: item.commit?.message || "No message",
+                    repo: item.repository?.full_name || "Unknown",
+                    timestamp: item.commit?.committer?.date || new Date().toISOString(),
+                    sha: item.sha
+                })
+            }
         }
 
-        const events = await eventsResponse.json()
-
-        // Get today's date range
-        const now = new Date()
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-        const todayEnd = new Date(todayStart)
-        todayEnd.setDate(todayEnd.getDate() + 1)
-
-        // Filter for today's push events
-        const todayPushEvents = events.filter((event: any) => {
-            if (event.type !== "PushEvent") return false
-            const eventDate = new Date(event.created_at)
-            return eventDate >= todayStart && eventDate < todayEnd
-        })
-
-        // Extract commit details
-        const commits = todayPushEvents.flatMap((event: any) => {
-            const repoName = event.repo?.name || "Unknown"
-            const eventTime = new Date(event.created_at)
-
-            return (event.payload?.commits || []).map((commit: any) => ({
-                message: commit.message,
-                repo: repoName,
-                timestamp: eventTime.toISOString(),
-                sha: commit.sha
-            }))
-        })
-
-        // Sort by timestamp (most recent first) and limit to 10
-        commits.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        const recentCommits = commits.slice(0, 10)
-
-        return NextResponse.json(recentCommits)
+        return NextResponse.json(commits)
 
     } catch (error) {
         console.error("Error fetching GitHub activity:", error)

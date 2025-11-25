@@ -38,7 +38,27 @@ export async function GET() {
         const userData = await userResponse.json()
         const username = userData.login
 
-        // Fetch recent events (last 100)
+        // Get today's date in ISO format (YYYY-MM-DD)
+        const today = new Date().toISOString().split('T')[0]
+
+        // Use GitHub Search API to count commits from today
+        const searchResponse = await fetch(
+            `https://api.github.com/search/commits?q=author:${username}+committer-date:${today}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${account.access_token}`,
+                    Accept: "application/vnd.github.cloak-preview+json" // Required for commit search
+                }
+            }
+        )
+
+        let commitsToday = 0
+        if (searchResponse.ok) {
+            const searchData = await searchResponse.json()
+            commitsToday = searchData.total_count || 0
+        }
+
+        // Fetch recent events to get repos worked on today
         const eventsResponse = await fetch(`https://api.github.com/users/${username}/events?per_page=100`, {
             headers: {
                 Authorization: `Bearer ${account.access_token}`,
@@ -46,54 +66,30 @@ export async function GET() {
             }
         })
 
-        if (!eventsResponse.ok) {
-            return NextResponse.json({ error: "Failed to fetch GitHub events" }, { status: eventsResponse.status })
+        let reposToday = 0
+        if (eventsResponse.ok) {
+            const events = await eventsResponse.json()
+
+            // Get today's date range
+            const now = new Date()
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+            const todayEnd = new Date(todayStart)
+            todayEnd.setDate(todayEnd.getDate() + 1)
+
+            // Filter events for today
+            const todayEvents = events.filter((event: any) => {
+                const eventDate = new Date(event.created_at)
+                return eventDate >= todayStart && eventDate < todayEnd
+            })
+
+            // Get unique repositories worked on today
+            const reposSet = new Set(
+                todayEvents
+                    .filter((event: any) => event.repo?.name)
+                    .map((event: any) => event.repo.name)
+            )
+            reposToday = reposSet.size
         }
-
-        const events = await eventsResponse.json()
-
-        // Get today's date range (start and end of day in local time)
-        const now = new Date()
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-        const todayEnd = new Date(todayStart)
-        todayEnd.setDate(todayEnd.getDate() + 1)
-
-        console.log('Today range:', { todayStart, todayEnd, now })
-
-        // Filter events for today
-        const todayEvents = events.filter((event: any) => {
-            const eventDate = new Date(event.created_at)
-            return eventDate >= todayStart && eventDate < todayEnd
-        })
-
-        console.log('Today events count:', todayEvents.length)
-        console.log('Today events types:', todayEvents.map((e: any) => e.type))
-
-        // Count commits (PushEvents) today
-        const pushEvents = todayEvents.filter((event: any) => event.type === "PushEvent")
-        console.log('Push events count:', pushEvents.length)
-
-        // Log first push event to see structure
-        if (pushEvents.length > 0) {
-            console.log('First push event payload:', JSON.stringify(pushEvents[0].payload, null, 2))
-        }
-
-        // Try both commits array and size property
-        const commitsToday = pushEvents.reduce((total: number, event: any) => {
-            // GitHub API can return commits in different ways
-            const commitsCount = event.payload?.commits?.length || event.payload?.size || 0
-            console.log('Event commits count:', commitsCount, 'from event:', event.repo?.name)
-            return total + commitsCount
-        }, 0)
-
-        console.log('Total commits today:', commitsToday)
-
-        // Get unique repositories worked on today
-        const reposToday = new Set(
-            todayEvents
-                .filter((event: any) => event.repo?.name)
-                .map((event: any) => event.repo.name)
-        )
 
         // Calculate productivity level based on commits
         let productivity: "Low" | "Medium" | "High"
@@ -107,7 +103,7 @@ export async function GET() {
 
         return NextResponse.json({
             commitsToday,
-            reposToday: reposToday.size,
+            reposToday,
             productivity,
             username: userData.login,
             avatar: userData.avatar_url
