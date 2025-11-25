@@ -52,11 +52,13 @@ export async function GET() {
 
         const events = await eventsResponse.json()
 
-        // Get today's date range (start and end of day in UTC)
+        // Get today's date range (start and end of day in local time)
         const now = new Date()
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         const todayEnd = new Date(todayStart)
         todayEnd.setDate(todayEnd.getDate() + 1)
+
+        console.log('Today range:', { todayStart, todayEnd, now })
 
         // Filter events for today
         const todayEvents = events.filter((event: any) => {
@@ -64,11 +66,27 @@ export async function GET() {
             return eventDate >= todayStart && eventDate < todayEnd
         })
 
+        console.log('Today events count:', todayEvents.length)
+        console.log('Today events types:', todayEvents.map((e: any) => e.type))
+
         // Count commits (PushEvents) today
         const pushEvents = todayEvents.filter((event: any) => event.type === "PushEvent")
+        console.log('Push events count:', pushEvents.length)
+
+        // Log first push event to see structure
+        if (pushEvents.length > 0) {
+            console.log('First push event payload:', JSON.stringify(pushEvents[0].payload, null, 2))
+        }
+
+        // Try both commits array and size property
         const commitsToday = pushEvents.reduce((total: number, event: any) => {
-            return total + (event.payload?.commits?.length || 0)
+            // GitHub API can return commits in different ways
+            const commitsCount = event.payload?.commits?.length || event.payload?.size || 0
+            console.log('Event commits count:', commitsCount, 'from event:', event.repo?.name)
+            return total + commitsCount
         }, 0)
+
+        console.log('Total commits today:', commitsToday)
 
         // Get unique repositories worked on today
         const reposToday = new Set(
