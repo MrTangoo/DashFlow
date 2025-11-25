@@ -736,13 +736,13 @@ Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de déta
 ## 📸 Screenshots
 
 ### Dashboard
-![Dashboard](./public/screenshots/dashboard.png)
+![Dashboard](./public/screenshots/dashboard.jpg)
 
 ### Page de Connexion
-![Login](./public/screenshots/login.png)
+![Login](./public/screenshots/login.jpg)
 
 ### Profil Utilisateur
-![Profile](./public/screenshots/profile.png)
+![Profile](./public/screenshots/profile.jpg)
 
 ---
 
