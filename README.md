@@ -716,7 +716,7 @@ Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de déta
 **Maxime Derbigny**
 
 - GitHub: [@MrTangoo](https://github.com/MrTangoo)
-- Email: votre.email@example.com
+- Email: maxime.derbigny@gmail.com
 
 ---
 
