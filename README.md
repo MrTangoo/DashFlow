@@ -44,7 +44,7 @@
 - 🎨 **Design moderne** avec glassmorphisme et animations Framer Motion
 - 🌍 **Multi-langue** (Français, Anglais, Allemand)
 - 🔐 **Authentification sécurisée** (Credentials + GitHub OAuth)
-- 📊 **6 widgets interactifs** pour une productivité maximale
+- 📊 **7 widgets interactifs** pour une productivité maximale
 - 🌙 **Mode sombre** automatique
 - 📱 **Responsive** sur tous les appareils
 - ⚡ **Performance optimale** avec Next.js 16 et React 19
@@ -101,6 +101,16 @@
 - Température ressentie
 - Recherche par ville
 - Icônes animées
+
+#### 7. 💻 **GitHub Activity** (pour utilisateurs GitHub OAuth)
+- **Suivi quotidien de l'activité GitHub**
+- Nombre de commits effectués aujourd'hui
+- Nombre de dépôts travaillés aujourd'hui
+- Indicateur de productivité (Low/Medium/High)
+- Liste des commits du jour avec messages et repos
+- Temps relatif pour chaque commit
+- État vide motivant si aucun commit
+- **Aligné avec le thème du dashboard** : focus sur l'activité du jour
 
 ### 👤 Profil Utilisateur
 
@@ -430,6 +440,7 @@ Composant principal du dashboard qui orchestre tous les widgets.
 - `pomodoro-widget.tsx` - Timer Pomodoro
 - `water-tracker-widget.tsx` - Suivi d'hydratation
 - `detailed-weather-widget.tsx` - Météo détaillée
+- `github-widget.tsx` - Activité GitHub quotidienne
 
 #### `components/providers/`
 - `auth-provider.tsx` - Gestion de l'authentification
@@ -468,6 +479,10 @@ Composant principal du dashboard qui orchestre tous les widgets.
 
 #### Météo
 - `GET /api/weather?city=Paris` - Récupérer la météo
+
+#### GitHub Activity
+- `GET /api/github/stats` - Récupérer les statistiques GitHub du jour
+- `GET /api/github/activity` - Récupérer les commits du jour
 
 ---
 

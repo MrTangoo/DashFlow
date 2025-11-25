@@ -7,6 +7,7 @@ import StatsWidget from "@/components/dashboard/stats-widget";
 import DetailedWeatherWidget from "@/components/dashboard/detailed-weather-widget";
 import PomodoroWidget from "@/components/dashboard/pomodoro-widget";
 import WaterTrackerWidget from "@/components/dashboard/water-tracker-widget";
+import GitHubWidget from "@/components/dashboard/github-widget";
 
 export default function DashboardContent({ session }: { session: any }) {
     const { t, locale } = useLocale();
@@ -68,6 +69,11 @@ export default function DashboardContent({ session }: { session: any }) {
                 {/* Stats Widget */}
                 <div className="md:col-span-1 h-[400px]">
                     <StatsWidget />
+                </div>
+
+                {/* GitHub Widget */}
+                <div className="md:col-span-1 h-[500px]">
+                    <GitHubWidget />
                 </div>
 
                 {/* Pomodoro Widget */}
