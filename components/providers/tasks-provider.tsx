@@ -66,7 +66,6 @@ export function TasksProvider({
                 setTasks(prev => prev.map(t =>
                     t.id === tempId ? { ...createdTask, clientId: tempId } : t
                 ))
-                router.refresh()
             } else {
                 setTasks(prev => prev.filter(t => t.id !== tempId))
             }

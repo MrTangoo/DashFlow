@@ -99,9 +99,10 @@ export default function TasksWidget() {
                         {filteredTasks.map((task) => (
                             <motion.div
                                 key={task.clientId || task.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, x: -100, scale: 0.8 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
                                 className={cn(
                                     "group flex items-center justify-between p-3 rounded-xl border border-transparent transition-all duration-200",
                                     task.completed

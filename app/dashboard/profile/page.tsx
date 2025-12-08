@@ -25,6 +25,7 @@ export default function ProfilePage() {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [githubAvatar, setGithubAvatar] = useState<string | null>(null);
 
     // Check if user has password on mount
     useEffect(() => {
@@ -39,8 +40,24 @@ export default function ProfilePage() {
                 console.error("Error checking password:", error);
             }
         }
+
+        async function fetchGithubAvatar() {
+            try {
+                const res = await fetch("/api/user/github-avatar");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.avatar) {
+                        setGithubAvatar(data.avatar);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching GitHub avatar:", error);
+            }
+        }
+
         if (session) {
             checkHasPassword();
+            fetchGithubAvatar();
         }
     }, [session]);
 
@@ -176,7 +193,8 @@ export default function ProfilePage() {
         return null;
     }
 
-    const currentImage = imagePreview || session.user?.image;
+    const currentImage = imagePreview || session.user?.image || githubAvatar;
+
 
     return (
         <div className="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">

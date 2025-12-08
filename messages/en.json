@@ -84,7 +84,10 @@
         "welcome": "Welcome",
         "subtitle": "Ready to organize your day?",
         "widgets": "Widgets",
-        "addWidget": "Add Widget"
+        "addWidget": "Add Widget",
+        "customize": "Customize",
+        "widgetSettings": "Widget Settings",
+        "widgetSettingsSubtitle": "Choose which widgets to display on your dashboard"
     },
     "widgets": {
         "weather": {
@@ -147,6 +150,26 @@
             "goalReached": "Goal reached! 🎉",
             "add": "Add",
             "reset": "Reset"
+        },
+        "github": {
+            "title": "Today's Activity",
+            "subtitle": "GitHub Stats",
+            "notConnected": "GitHub Not Connected",
+            "connectPrompt": "Connect your GitHub account to track your daily coding activity",
+            "errorLoading": "Error Loading Data",
+            "errorFetching": "Failed to fetch GitHub activity",
+            "commits": "Commits",
+            "today": "Today",
+            "repos": "Repos",
+            "workedOn": "Worked on",
+            "level": "Level",
+            "productivity": "Productivity",
+            "todaysCommits": "Today's Commits",
+            "noCommits": "No commits yet today",
+            "timeToCode": "Time to code! 💻",
+            "justNow": "Just now",
+            "minutesAgo": "m ago",
+            "hoursAgo": "h ago"
         }
     },
     "history": {

@@ -84,9 +84,9 @@ export default function GitHubWidget() {
         const diffMins = Math.floor(diffMs / 60000)
         const diffHours = Math.floor(diffMins / 60)
 
-        if (diffMins < 1) return "Just now"
-        if (diffMins < 60) return `${diffMins}m ago`
-        if (diffHours < 24) return `${diffHours}h ago`
+        if (diffMins < 1) return t("widgets.github.justNow")
+        if (diffMins < 60) return `${diffMins}${t("widgets.github.minutesAgo")}`
+        if (diffHours < 24) return `${diffHours}${t("widgets.github.hoursAgo")}`
         return then.toLocaleDateString()
     }
 
@@ -104,8 +104,8 @@ export default function GitHubWidget() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-purple-500/10 rounded-full blur-[60px] -z-10" />
                 <Github className="w-12 h-12 text-white/20" />
                 <div className="text-center">
-                    <h3 className="text-lg font-semibold text-white mb-2">GitHub Not Connected</h3>
-                    <p className="text-sm text-slate-400">Connect your GitHub account to track your daily coding activity</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">{t("widgets.github.notConnected")}</h3>
+                    <p className="text-sm text-slate-400">{t("widgets.github.connectPrompt")}</p>
                 </div>
             </div>
         )
@@ -116,8 +116,8 @@ export default function GitHubWidget() {
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl h-full flex flex-col items-center justify-center gap-4">
                 <AlertCircle className="w-12 h-12 text-red-400" />
                 <div className="text-center">
-                    <h3 className="text-lg font-semibold text-white mb-2">Error Loading Data</h3>
-                    <p className="text-sm text-slate-400">Failed to fetch GitHub activity</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">{t("widgets.github.errorLoading")}</h3>
+                    <p className="text-sm text-slate-400">{t("widgets.github.errorFetching")}</p>
                 </div>
             </div>
         )
@@ -135,8 +135,8 @@ export default function GitHubWidget() {
                         <Github className="w-6 h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-white">Today's Activity</h2>
-                        <p className="text-xs text-slate-400 font-medium">GitHub Stats</p>
+                        <h2 className="text-xl font-bold text-white">{t("widgets.github.title")}</h2>
+                        <p className="text-xs text-slate-400 font-medium">{t("widgets.github.subtitle")}</p>
                     </div>
                 </div>
                 {stats.avatar && (
@@ -158,10 +158,10 @@ export default function GitHubWidget() {
                 >
                     <div className="flex items-center gap-2 text-purple-400 mb-2">
                         <GitCommit className="w-4 h-4" />
-                        <span className="text-xs font-medium uppercase tracking-wider">Commits</span>
+                        <span className="text-xs font-medium uppercase tracking-wider">{t("widgets.github.commits")}</span>
                     </div>
                     <div className="text-2xl font-bold text-white">{stats.commitsToday}</div>
-                    <div className="text-xs text-white/40 mt-1">Today</div>
+                    <div className="text-xs text-white/40 mt-1">{t("widgets.github.today")}</div>
                 </motion.div>
 
                 <motion.div
@@ -172,10 +172,10 @@ export default function GitHubWidget() {
                 >
                     <div className="flex items-center gap-2 text-blue-400 mb-2">
                         <FolderGit2 className="w-4 h-4" />
-                        <span className="text-xs font-medium uppercase tracking-wider">Repos</span>
+                        <span className="text-xs font-medium uppercase tracking-wider">{t("widgets.github.repos")}</span>
                     </div>
                     <div className="text-2xl font-bold text-white">{stats.reposToday}</div>
-                    <div className="text-xs text-white/40 mt-1">Worked on</div>
+                    <div className="text-xs text-white/40 mt-1">{t("widgets.github.workedOn")}</div>
                 </motion.div>
 
                 <motion.div
@@ -186,27 +186,27 @@ export default function GitHubWidget() {
                 >
                     <div className="flex items-center gap-2 text-emerald-400 mb-2">
                         <TrendingUp className="w-4 h-4" />
-                        <span className="text-xs font-medium uppercase tracking-wider">Level</span>
+                        <span className="text-xs font-medium uppercase tracking-wider">{t("widgets.github.level")}</span>
                     </div>
                     <div className={`text-2xl font-bold ${getProductivityColor(stats.productivity)}`}>
                         {stats.productivity}
                     </div>
-                    <div className="text-xs text-white/40 mt-1">Productivity</div>
+                    <div className="text-xs text-white/40 mt-1">{t("widgets.github.productivity")}</div>
                 </motion.div>
             </div>
 
             {/* Commits List */}
             <div className="flex-1 flex flex-col min-h-0">
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">
-                    Today's Commits
+                    {t("widgets.github.todaysCommits")}
                 </h3>
 
                 {commits.length === 0 ? (
                     <div className="flex-1 flex items-center justify-center">
                         <div className="text-center">
                             <GitCommit className="w-8 h-8 text-white/10 mx-auto mb-2" />
-                            <p className="text-sm text-white/40">No commits yet today</p>
-                            <p className="text-xs text-white/20 mt-1">Time to code! 💻</p>
+                            <p className="text-sm text-white/40">{t("widgets.github.noCommits")}</p>
+                            <p className="text-xs text-white/20 mt-1">{t("widgets.github.timeToCode")}</p>
                         </div>
                     </div>
                 ) : (
