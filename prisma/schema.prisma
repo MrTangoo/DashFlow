@@ -64,12 +64,13 @@ model VerificationToken {
 
 model Widget {
   id        String   @id @default(cuid())
-  type      String   // "weather", "tasks", "notes", "stats", "github", "pomodoro", "water"
+  type      String   // "weather", "tasks", "notes", "stats", "github", "pomodoro", "waterTracker"
   x         Int
   y         Int
   w         Int
   h         Int
   visible   Boolean  @default(true)
+  order     Int      @default(0)
   settings  Json?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

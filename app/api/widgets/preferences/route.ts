@@ -14,22 +14,29 @@ export async function GET(req: NextRequest) {
         // Get all widgets for the user
         const widgets = await prisma.widget.findMany({
             where: { userId: session.user.id },
-            select: { type: true, visible: true }
+            select: { type: true, visible: true, order: true },
+            orderBy: { order: 'asc' }
         });
 
-        // Create a map of widget visibility
-        const preferences: Record<string, boolean> = {};
+        // Create a map of widget visibility and order
+        const preferences: Record<string, { visible: boolean; order: number }> = {};
         widgets.forEach(widget => {
-            preferences[widget.type] = widget.visible;
+            preferences[widget.type] = {
+                visible: widget.visible,
+                order: widget.order
+            };
         });
 
-        // Default widget types
-        const defaultTypes = ["tasks", "notes", "stats", "github", "pomodoro", "water", "weather"];
+        // Default widget types with default order
+        const defaultTypes = ["tasks", "notes", "stats", "github", "pomodoro", "waterTracker", "weather"];
 
-        // Fill in missing widgets with default visibility
-        defaultTypes.forEach(type => {
+        // Fill in missing widgets with default visibility and order
+        defaultTypes.forEach((type, index) => {
             if (!(type in preferences)) {
-                preferences[type] = true;
+                preferences[type] = {
+                    visible: true,
+                    order: index
+                };
             }
         });
 
